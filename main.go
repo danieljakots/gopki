@@ -66,12 +66,10 @@ func createCertificate() {
 	cert := &x509.Certificate{
 		SerialNumber: big.NewInt(2020),
 		Subject: pkix.Name{
-			Organization:  []string{"Jean Canard cult."},
-			Country:       []string{"CA"},
-			Province:      []string{"Quebec"},
-			Locality:      []string{"Montreal"},
-			StreetAddress: []string{""},
-			PostalCode:    []string{""},
+			Organization: []string{"Jean Canard cult."},
+			Country:      []string{"CA"},
+			Province:     []string{"Quebec"},
+			Locality:     []string{"Montreal"},
 		},
 		DNSNames:     []string{name},
 		NotBefore:    time.Now(),
@@ -141,12 +139,10 @@ func createCA() {
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(2019),
 		Subject: pkix.Name{
-			Organization:  []string{"Jean Canard cult."},
-			Country:       []string{"CA"},
-			Province:      []string{"Quebec"},
-			Locality:      []string{"Montreal"},
-			StreetAddress: []string{""},
-			PostalCode:    []string{""},
+			Organization: []string{"Jean Canard cult."},
+			Country:      []string{"CA"},
+			Province:     []string{"Quebec"},
+			Locality:     []string{"Montreal"},
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().AddDate(10, 0, 0),
