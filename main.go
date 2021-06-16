@@ -47,8 +47,8 @@ func createCertificate() {
 		Subject: pkix.Name{
 			Organization:  []string{"Jean Canard cult."},
 			Country:       []string{"CA"},
-			Province:      []string{"Québec"},
-			Locality:      []string{"Montréal"},
+			Province:      []string{"Quebec"},
+			Locality:      []string{"Montreal"},
 			StreetAddress: []string{""},
 			PostalCode:    []string{""},
 		},
@@ -113,8 +113,8 @@ func createCA() {
 		Subject: pkix.Name{
 			Organization:  []string{"Jean Canard cult."},
 			Country:       []string{"CA"},
-			Province:      []string{"Québec"},
-			Locality:      []string{"Montréal"},
+			Province:      []string{"Quebec"},
+			Locality:      []string{"Montreal"},
 			StreetAddress: []string{""},
 			PostalCode:    []string{""},
 		},
