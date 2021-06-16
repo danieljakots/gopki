@@ -75,8 +75,9 @@ func createCertificate() {
 		NotBefore:    time.Now(),
 		NotAfter:     time.Now().AddDate(10, 0, 0),
 		SubjectKeyId: []byte{1, 2, 3, 4, 6},
-		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		KeyUsage:     x509.KeyUsageDigitalSignature,
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth,
+			x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageAny},
+		KeyUsage: x509.KeyUsageDigitalSignature,
 	}
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -144,10 +145,11 @@ func createCA() {
 			Province:     []string{"Quebec"},
 			Locality:     []string{"Montreal"},
 		},
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().AddDate(10, 0, 0),
-		IsCA:                  true,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		NotBefore: time.Now(),
+		NotAfter:  time.Now().AddDate(10, 0, 0),
+		IsCA:      true,
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth,
+			x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageAny},
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		BasicConstraintsValid: true,
 	}
