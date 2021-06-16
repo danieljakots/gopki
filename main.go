@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
@@ -8,9 +9,11 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"flag"
+	"fmt"
 	"log"
 	"math/big"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -40,10 +43,28 @@ func main() {
 	}
 }
 
+func getKey() (string, error) {
+	fmt.Println("Enter the CA private key")
+	var key string
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		key += scanner.Text()
+		key += "\n"
+		if strings.Contains(key, "-----END RSA PRIVATE KEY-----") {
+			break
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
+	return key, nil
+}
+
 func createCertificate() {
 	name := "localhost"
 	cert := &x509.Certificate{
-		SerialNumber: big.NewInt(2019),
+		SerialNumber: big.NewInt(2020),
 		Subject: pkix.Name{
 			Organization:  []string{"Jean Canard cult."},
 			Country:       []string{"CA"},
@@ -59,7 +80,7 @@ func createCertificate() {
 		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:     x509.KeyUsageDigitalSignature,
 	}
-	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -84,11 +105,20 @@ func createCertificate() {
 	caBlock, _ := pem.Decode(caBytes)
 	ca, err := x509.ParseCertificate(caBlock.Bytes)
 	if err != nil {
-		log.Fatal("parse ", err)
+		log.Fatal(err)
+	}
+	caPrivateKey, err := getKey()
+	if err != nil {
+		log.Fatal(err)
+	}
+	block, _ = pem.Decode([]byte(caPrivateKey))
+	caPK, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	certBytes, err := x509.CreateCertificate(rand.Reader, cert, ca,
-		&privateKey.PublicKey, privateKey)
+		&privateKey.PublicKey, caPK)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -128,7 +158,7 @@ func createCA() {
 
 	buffy := new(bytes.Buffer)
 
-	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -139,10 +169,9 @@ func createCA() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = os.WriteFile("ca.key", buffy.Bytes(), 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
+	fmt.Println("Save the key, you'll need it to create a certificate")
+	fmt.Print(buffy)
+	fmt.Println("Save the key, you'll need it to create a certificate")
 
 	buffy = new(bytes.Buffer)
 
