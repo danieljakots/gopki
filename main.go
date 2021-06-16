@@ -74,6 +74,62 @@ func getKey() (string, error) {
 	return key, nil
 }
 
+func createRSAKey(name string) (*rsa.PrivateKey, error) {
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		return nil, err
+	}
+	block := &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
+	}
+	buffy := new(bytes.Buffer)
+	err = pem.Encode(buffy, block)
+	if err != nil {
+		return nil, err
+	}
+	if name != "" {
+		err = os.WriteFile(name+".key", buffy.Bytes(), 0644)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		fmt.Println("Save the key, you'll need it to create a certificate")
+		fmt.Print(buffy)
+		fmt.Println("Save the key, you'll need it to create a certificate")
+	}
+	return privateKey, nil
+}
+
+func writeCert(name string, certBytes []byte) error {
+	buffy := new(bytes.Buffer)
+	err := pem.Encode(buffy, &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: certBytes,
+	})
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(name+".crt", buffy.Bytes(), 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func confirmCert(certBytes []byte, ca *x509.Certificate) error {
+	c, err := x509.ParseCertificate(certBytes)
+	if err != nil {
+		return err
+	}
+	err = c.CheckSignatureFrom(ca)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func createCertificate(name string) {
 	cert := &x509.Certificate{
 		SerialNumber: big.NewInt(time.Now().Unix()),
@@ -92,20 +148,8 @@ func createCertificate(name string) {
 			x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageAny},
 		KeyUsage: x509.KeyUsageDigitalSignature,
 	}
-	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		log.Fatal(err)
-	}
-	block := &pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
-	}
-	buffy := new(bytes.Buffer)
-	err = pem.Encode(buffy, block)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = os.WriteFile(name+".key", buffy.Bytes(), 0644)
+
+	pk, err := createRSAKey(name)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -123,36 +167,24 @@ func createCertificate(name string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	block, _ = pem.Decode([]byte(caPrivateKey))
+	block, _ := pem.Decode([]byte(caPrivateKey))
 	caPK, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	certBytes, err := x509.CreateCertificate(rand.Reader, cert, ca,
-		&privateKey.PublicKey, caPK)
+		&pk.PublicKey, caPK)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	c, err := x509.ParseCertificate(certBytes)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = c.CheckSignatureFrom(ca)
+	err = confirmCert(certBytes, ca)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = pem.Encode(buffy, &pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: certBytes,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = os.WriteFile(name+".crt", buffy.Bytes(), 0644)
+	err = writeCert(name, certBytes)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -177,39 +209,18 @@ func createCA() {
 		BasicConstraintsValid: true,
 	}
 
-	buffy := new(bytes.Buffer)
-
-	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	pk, err := createRSAKey("")
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = pem.Encode(buffy, &pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Save the key, you'll need it to create a certificate")
-	fmt.Print(buffy)
-	fmt.Println("Save the key, you'll need it to create a certificate")
-
-	buffy = new(bytes.Buffer)
 
 	caBytes, err := x509.CreateCertificate(rand.Reader, ca, ca,
-		&privateKey.PublicKey, privateKey)
+		&pk.PublicKey, pk)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = pem.Encode(buffy, &pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: caBytes,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = os.WriteFile("ca.crt", buffy.Bytes(), 0644)
+	err = writeCert("ca", caBytes)
 	if err != nil {
 		log.Fatal(err)
 	}
