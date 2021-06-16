@@ -64,7 +64,7 @@ func getKey() (string, error) {
 func createCertificate() {
 	name := "localhost"
 	cert := &x509.Certificate{
-		SerialNumber: big.NewInt(2020),
+		SerialNumber: big.NewInt(time.Now().Unix()),
 		Subject: pkix.Name{
 			Organization: []string{"Jean Canard cult."},
 			Country:      []string{"CA"},
@@ -138,7 +138,7 @@ func createCertificate() {
 
 func createCA() {
 	ca := &x509.Certificate{
-		SerialNumber: big.NewInt(2019),
+		SerialNumber: big.NewInt(time.Now().Unix()),
 		Subject: pkix.Name{
 			Organization: []string{"Jean Canard cult."},
 			Country:      []string{"CA"},
