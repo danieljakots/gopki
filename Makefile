@@ -34,7 +34,7 @@ simplify:
 
 test:
 	go vet
-	go test -v
+	./${TARGET} -init && ./${TARGET} -create -domain bleh.chown.me && openssl verify -CAfile ca.crt bleh.chown.me.crt
 
 testcov:
 	go test -cover -v
