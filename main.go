@@ -25,18 +25,22 @@ func cli() (bool, bool, string) {
 
 	if !*create && !*init {
 		flag.PrintDefaults()
+		os.Exit(1)
 	}
 
 	if *create && *init {
 		flag.PrintDefaults()
+		os.Exit(1)
 	}
 	if *init && *domain != "" {
 		fmt.Println("Why did you supply a domain?")
 		flag.PrintDefaults()
+		os.Exit(1)
 	}
 	if *create && *domain == "" {
 		fmt.Println("Domain is missing")
 		flag.PrintDefaults()
+		os.Exit(1)
 	}
 
 	return *create, *init, *domain
