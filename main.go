@@ -154,7 +154,7 @@ func createCertificate(name string) {
 	cert := &x509.Certificate{
 		SerialNumber: big.NewInt(time.Now().Unix()),
 		Subject: pkix.Name{
-			Organization: []string{"Jean Canard cult."},
+			Organization: []string{"Jean Canard cult"},
 			Country:      []string{"CA"},
 			Province:     []string{"Quebec"},
 			Locality:     []string{"Montreal"},
@@ -214,7 +214,7 @@ func createCA() {
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(time.Now().Unix()),
 		Subject: pkix.Name{
-			Organization: []string{"Jean Canard cult."},
+			Organization: []string{"Jean Canard cult"},
 			Country:      []string{"CA"},
 			Province:     []string{"Quebec"},
 			Locality:     []string{"Montreal"},
