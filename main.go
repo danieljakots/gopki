@@ -122,6 +122,15 @@ func createCertificate() {
 		log.Fatal(err)
 	}
 
+	c, err := x509.ParseCertificate(certBytes)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = c.CheckSignatureFrom(ca)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	err = pem.Encode(buffy, &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: certBytes,
