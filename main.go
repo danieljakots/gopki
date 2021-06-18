@@ -95,7 +95,7 @@ func getKey() (string, error) {
 }
 
 func createRSAKey(name string) (*rsa.PrivateKey, error) {
-	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
 		return nil, err
 	}
