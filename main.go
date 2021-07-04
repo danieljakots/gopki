@@ -150,16 +150,20 @@ func confirmCert(certBytes []byte, ca *x509.Certificate) error {
 	return nil
 }
 
+func getDN(name string) pkix.Name {
+	return pkix.Name{
+		Organization: []string{"Jean Canard cult"},
+		Country:      []string{"CA"},
+		Province:     []string{"Quebec"},
+		Locality:     []string{"Montreal"},
+		CommonName:   name,
+	}
+}
+
 func createCertificate(name string) {
 	cert := &x509.Certificate{
 		SerialNumber: big.NewInt(time.Now().Unix()),
-		Subject: pkix.Name{
-			Organization: []string{"Jean Canard cult"},
-			Country:      []string{"CA"},
-			Province:     []string{"Quebec"},
-			Locality:     []string{"Montreal"},
-			CommonName:   name,
-		},
+		Subject:      getDN(name),
 		DNSNames:     []string{name},
 		NotBefore:    time.Now(),
 		NotAfter:     time.Now().AddDate(10, 0, 0),
@@ -213,16 +217,10 @@ func createCertificate(name string) {
 func createCA() {
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(time.Now().Unix()),
-		Subject: pkix.Name{
-			Organization: []string{"Jean Canard cult"},
-			Country:      []string{"CA"},
-			Province:     []string{"Quebec"},
-			Locality:     []string{"Montreal"},
-			CommonName:   "ca.chown.me",
-		},
-		NotBefore: time.Now(),
-		NotAfter:  time.Now().AddDate(10, 0, 0),
-		IsCA:      true,
+		Subject:      getDN("ca.chown.me"),
+		NotBefore:    time.Now(),
+		NotAfter:     time.Now().AddDate(10, 0, 0),
+		IsCA:         true,
 		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth,
 			x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageAny},
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
