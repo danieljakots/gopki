@@ -20,3 +20,21 @@ The key aren't encrypted since the only way to do it is
 For this reason, the CA key isn't written to disk. The program outputs the key
 to *stdout* so the user can save it in their favorite password manager. When
 signing a new certificate, the CA's key will be required through a prompt.
+
+### Usage
+
+```
+$ ./gopki -h
+Usage of ./gopki:
+  -create
+    	Create a new certificate (and sign it)
+  -domain string
+    	Domain for the certificate or the CA
+  -init
+    	Initialize a new PKI
+```
+
+```
+gopki -init -domain ca.chown.me
+gopki -create -domain bleh.chown.me
+```
