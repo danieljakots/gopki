@@ -34,7 +34,7 @@ simplify:
 
 test:
 	go vet
-	./${TARGET} -init && ./${TARGET} -create -domain bleh.chown.me && \
+	./${TARGET} -init -domain ca.chown.me && ./${TARGET} -create -domain bleh.chown.me && \
 		openssl verify -CAfile ca.crt bleh.chown.me.crt && \
 		rm ca.crt bleh.chown.me.crt bleh.chown.me.key
 

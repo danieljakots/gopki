@@ -40,7 +40,7 @@ import (
 func cli() (bool, bool, string) {
 	create := flag.Bool("create", false, "Create a new certificate (and sign it)")
 	init := flag.Bool("init", false, "Initialize a new PKI")
-	domain := flag.String("domain", "", "Domain to create a certificate for")
+	domain := flag.String("domain", "", "Domain for the certificate or the CA")
 	flag.Parse()
 
 	if !*create && !*init {
@@ -52,12 +52,7 @@ func cli() (bool, bool, string) {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
-	if *init && *domain != "" {
-		fmt.Println("Why did you supply a domain?")
-		flag.PrintDefaults()
-		os.Exit(1)
-	}
-	if *create && *domain == "" {
+	if *domain == "" {
 		fmt.Println("Domain is missing")
 		flag.PrintDefaults()
 		os.Exit(1)
@@ -72,7 +67,7 @@ func main() {
 	if create {
 		createCertificate(domain)
 	} else if init {
-		createCA()
+		createCA(domain)
 	}
 }
 
@@ -214,10 +209,10 @@ func createCertificate(name string) {
 	}
 }
 
-func createCA() {
+func createCA(name string) {
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(time.Now().Unix()),
-		Subject:      getDN("ca.chown.me"),
+		Subject:      getDN(name),
 		NotBefore:    time.Now(),
 		NotAfter:     time.Now().AddDate(10, 0, 0),
 		IsCA:         true,
