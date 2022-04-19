@@ -1,3 +1,3 @@
-module github.com/danieljakots/gopki
+module go.chown.me/gopki
 
 go 1.16
